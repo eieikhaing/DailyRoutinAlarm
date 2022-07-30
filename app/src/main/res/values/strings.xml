@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DailyRoutine</string>
+    <string name="task_title">Task Title</string>
+    <string name="enter_task">Enter your task</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
+    <string name="save_task">Save Task</string>
+</resources>
