@@ -1,17 +1,19 @@
 package com.test.dailyroutine.task_list
 
-import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.test.dailyroutine.R
 import com.test.dailyroutine.database.ToDoTaskModel
 import com.test.dailyroutine.databinding.ItemTaskBinding
+import com.test.dailyroutine.util.FormatDate.Companion.formatDate
+import com.test.dailyroutine.util.FormatDate.Companion.formatTime
 import kotlinx.android.synthetic.main.item_task.view.*
-import java.text.SimpleDateFormat
 import java.util.*
 
-class TaskListAdapter(val requireContext: Context) :
+class TaskListAdapter(val requireContext: TaskListFragment) :
     RecyclerView.Adapter<TaskListAdapter.ViewHolder>() {
 
     var taskList = emptyList<ToDoTaskModel>()
@@ -39,39 +41,32 @@ class TaskListAdapter(val requireContext: Context) :
     }
 
     override fun getItemId(position: Int): Long {
-        return taskList[position].id
+        return taskList[position].notiId.toLong()
     }
 
     class ViewHolder(private val binding: ItemTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bindData(todoModel: ToDoTaskModel, requireContext: Context) {
+        fun bindData(todoModel: ToDoTaskModel, requireContext: TaskListFragment) {
             val colors = itemView.resources.getIntArray(R.array.random_color)
             val randomColor = colors[Random().nextInt(colors.size)]
             itemView.viewColorTag.setBackgroundColor(randomColor)
+            itemView.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putSerializable("task", todoModel)
+                findNavController(requireContext).navigate(
+                    R.id.action_taskListFragment_to_updateTaskFragment,
+                    bundle
+                )
+            }
             with(binding) {
                 txtShowTitle.text = todoModel.taskTitle
                 txtShowTask.text = todoModel.taskDesc
-                formatTime(todoModel.taskTime)
-                formatDate(todoModel.taskDate)
+                txtShowTime.text = formatTime(todoModel.taskTime)
+                txtShowDate.text = formatDate(todoModel.taskDate)
 
             }
         }
 
-        private fun formatTime(time: Long) {
-            //Mon, 5 Jan 2020
-            val myformat = "h:mm a"
-            val sdf = SimpleDateFormat(myformat)
-            binding.txtShowTime.text = sdf.format(Date(time))
-
-        }
-
-        private fun formatDate(time: Long) {
-            //Mon, 5 Jan 2020
-            val myformat = "EEE, d MMM yyyy"
-            val sdf = SimpleDateFormat(myformat)
-            binding.txtShowDate.text = sdf.format(Date(time))
-
-        }
     }
 
 }

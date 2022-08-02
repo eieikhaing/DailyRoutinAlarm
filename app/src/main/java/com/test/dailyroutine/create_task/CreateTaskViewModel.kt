@@ -17,10 +17,11 @@ class CreateTaskViewModel(
         taskDesc: String,
         taskDate: Long,
         taskTime: Long,
-        notiTime: String
+        notiTime: String,
+        notiId : Int
     ) {
         viewModelScope.launch {
-            val newTask = ToDoTaskModel(taskTitle, taskDesc, taskDate, taskTime,notiTime)
+            val newTask = ToDoTaskModel(taskTitle, taskDesc, taskDate, taskTime,notiTime,notiId)
             insert(newTask)
 
         }

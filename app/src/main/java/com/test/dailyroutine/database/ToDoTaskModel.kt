@@ -3,6 +3,7 @@ package com.test.dailyroutine.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "to_do_table")
 data class ToDoTaskModel(
@@ -22,10 +23,13 @@ data class ToDoTaskModel(
     @ColumnInfo(name = "noti_time")
     var notiTime: String,
 
-    @ColumnInfo(name = "task_status")
-    var isFinished: Int = 0,
+   /* @ColumnInfo(name = "task_status")
+    var isFinished: Long = 0,
+*/
+    @ColumnInfo(name = "noti_id")
+    var notiId: Int = 0,
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
-)
+) : Serializable

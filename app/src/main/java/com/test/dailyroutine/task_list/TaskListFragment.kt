@@ -28,6 +28,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
+
 class TaskListFragment : Fragment() {
 
     private lateinit var binding: FragTaskListBinding
@@ -52,7 +53,7 @@ class TaskListFragment : Fragment() {
         binding.viewModel = taskListViewModel
         binding.lifecycleOwner = this
         taskListViewModel.getAllTaskList()
-        taskListAdapter = TaskListAdapter(requireContext())
+        taskListAdapter = TaskListAdapter(this)
         binding.rvTaskList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = taskListAdapter
@@ -94,9 +95,9 @@ class TaskListFragment : Fragment() {
                 if (direction == ItemTouchHelper.LEFT) {
                     GlobalScope.launch(Dispatchers.IO) {
                         val deletedId = taskListAdapter.getItemId(position)
-                        val notiId = dataSource.getNotiId(deletedId)
+                       // val notiId = dataSource.getNotiId(deletedId)
                         dataSource.deleteTask(deletedId)
-                        deleteNotification(notiId)
+                        deleteNotification(deletedId)
                     }
                 }
             }
@@ -178,9 +179,25 @@ class TaskListFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rvTaskList)
     }
 
-    private fun deleteNotification(notiId: String) {
+    private fun deleteNotification(notiId: Long) {
         val intent = Intent(requireContext(), AlarmNotification::class.java)
-        intent.putExtra(titleExtra, notiId)
+        intent.putExtra(notiIdExtra, notiId)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext(),
+            notificationID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+
+        )
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+       // val time = getTime(notiTime)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            myCalendar.time.time,
+            pendingIntent
+        )
+        alarmManager.cancel(pendingIntent)
     }
 
     private fun scheduleNotification(taskTitle: String, taskDesc: String, notiTime: String)

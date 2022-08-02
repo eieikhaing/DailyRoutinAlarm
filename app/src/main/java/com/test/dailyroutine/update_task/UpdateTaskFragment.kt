@@ -1,6 +1,9 @@
-package com.test.dailyroutine.create_task
+package com.test.dailyroutine.update_task
 
-import android.app.*
+import android.app.AlarmManager
+import android.app.DatePickerDialog
+import android.app.PendingIntent
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,24 +18,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.test.dailyroutine.AlarmNotification
 import com.test.dailyroutine.database.ToDoDatabase
-import com.test.dailyroutine.databinding.FragAddTaskBinding
+import com.test.dailyroutine.database.ToDoTaskModel
+import com.test.dailyroutine.databinding.FragUpdateTaskBinding
 import com.test.dailyroutine.messageExtra
 import com.test.dailyroutine.notificationID
 import com.test.dailyroutine.titleExtra
+import com.test.dailyroutine.util.FormatDate
 import kotlinx.android.synthetic.main.frag_add_task.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class CreateTaskFragment : Fragment() {
+class UpdateTaskFragment : Fragment() {
 
-    private lateinit var binding: FragAddTaskBinding
+    private lateinit var binding: FragUpdateTaskBinding
     lateinit var myCalendar: Calendar
+    lateinit var todoModel : ToDoTaskModel
 
     lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
     private var minute = 0
-    private var hour= 0
+    private var hour = 0
     private var day = 0
     private var month = 0
     private var year = 0
@@ -43,21 +49,29 @@ class CreateTaskFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragAddTaskBinding.inflate(layoutInflater)
+        binding = FragUpdateTaskBinding.inflate(layoutInflater)
         val application = requireNotNull(this.activity).application
 
         val dataSource = ToDoDatabase.getInstance(application).todoDao
 
-        val viewModelFactory = CreateTaskViewModelFactory(dataSource, application)
-        val createTaskViewModel =
+        val viewModelFactory = UpdateTaskViewModelFactory(dataSource, application)
+        val updateTaskViewModel =
             ViewModelProvider(
                 this, viewModelFactory
-            ).get(CreateTaskViewModel::class.java)
+            ).get(UpdateTaskViewModel::class.java)
         binding.lifecycleOwner = this
-        binding.viewModel = createTaskViewModel
+        binding.viewModel = updateTaskViewModel
+        todoModel = arguments?.getSerializable("task") as ToDoTaskModel
         with(binding) {
+            edtTaskTitle.setText(todoModel.taskTitle)
+            edtTask.setText(todoModel.taskDesc)
+            edtSetDate.setText(FormatDate.formatDate(todoModel.taskDate))
+            edtTime.setText(FormatDate.formatTime(todoModel.taskTime))
+            finalDate = todoModel.taskDate
+            finalTime = todoModel.taskTime
             btnSaveTask.setOnClickListener {
-                val notiTimeString = year.toString()+","+month+","+day+","+hour+","+minute
+                val notiTimeString =
+                    year.toString() + "," + month + "," + day + "," + hour + "," + minute
                 notiTime.add(year)
                 notiTime.add(month)
                 notiTime.add(day)
@@ -65,8 +79,8 @@ class CreateTaskFragment : Fragment() {
                 notiTime.add(minute)
 
                 if (isValidData()) {
-                  val notificationId = System.currentTimeMillis().toInt()
-                    createTaskViewModel.createTask(
+                    val notificationId = todoModel.notiId
+                    updateTaskViewModel.updateTask(
                         edt_task_title.text.toString(),
                         edt_task.text.toString(),
                         finalDate,
@@ -161,8 +175,7 @@ class CreateTaskFragment : Fragment() {
         return true
     }
 
-    private fun scheduleNotification(notificationId: Int)
-    {
+    private fun scheduleNotification(notificationId: Int) {
         val intent = Intent(requireContext(), AlarmNotification::class.java)
         val title = binding.edtTaskTitle.text.toString()
         val message = binding.edtTask.text.toString()
@@ -185,8 +198,8 @@ class CreateTaskFragment : Fragment() {
         )
 
     }
-    private fun getTime(): Long
-    {
+
+    private fun getTime(): Long {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, day, hour, minute)
         return calendar.timeInMillis

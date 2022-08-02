@@ -12,9 +12,17 @@
             android:id="@+id/action_taskListFragment_to_createTaskFragment"
             app:destination="@id/createTaskFragment"
             app:popUpTo="@id/taskListFragment" />
+        <action
+            android:id="@+id/action_taskListFragment_to_updateTaskFragment"
+            app:destination="@id/updateTaskFragment"
+            app:popUpTo="@id/taskListFragment" />
     </fragment>
     <fragment
         android:id="@+id/createTaskFragment"
         android:name="com.test.dailyroutine.create_task.CreateTaskFragment"
         android:label="CreateTaskFragment" />
+    <fragment
+        android:id="@+id/updateTaskFragment"
+        android:name="com.test.dailyroutine.update_task.UpdateTaskFragment"
+        android:label="UpdateTaskFragment" />
 </navigation>
