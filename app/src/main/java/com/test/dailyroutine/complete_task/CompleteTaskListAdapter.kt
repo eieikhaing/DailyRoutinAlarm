@@ -1,13 +1,11 @@
 package com.test.dailyroutine.complete_task
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.test.dailyroutine.R
 import com.test.dailyroutine.database.ToDoTaskModel
-import com.test.dailyroutine.databinding.ItemTaskBinding
+import com.test.dailyroutine.databinding.CompleteItemTaskBinding
 import com.test.dailyroutine.util.FormatDate.Companion.formatDate
 import com.test.dailyroutine.util.FormatDate.Companion.formatTime
 import kotlinx.android.synthetic.main.item_task.view.*
@@ -24,7 +22,7 @@ class CompleteTaskListAdapter(val requireContext: CompletedTaskFragment) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemTaskBinding.inflate(
+            CompleteItemTaskBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -44,7 +42,7 @@ class CompleteTaskListAdapter(val requireContext: CompletedTaskFragment) :
         return taskList[position].notiId.toLong()
     }
 
-    class ViewHolder(private val binding: ItemTaskBinding) :
+    class ViewHolder(private val binding: CompleteItemTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bindData(todoModel: ToDoTaskModel, requireContext: CompletedTaskFragment) {
             val colors = itemView.resources.getIntArray(R.array.random_color)
