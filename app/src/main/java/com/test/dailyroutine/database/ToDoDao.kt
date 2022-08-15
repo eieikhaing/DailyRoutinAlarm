@@ -15,13 +15,19 @@ interface ToDoDao {
     /*@Update
     suspend fun updateTask(newTask: ToDoTaskModel)*/
 
-    @Query("Select * from to_do_table")
+    @Query("Select * from to_do_table where task_status == 0")
     fun getTask(): LiveData<List<ToDoTaskModel>>
 
-    /*@Query("Update to_do_table Set task_status = 1 where id=:uid")
-    fun finishTask(uid:Long)*/
-    @Query("Update to_do_table Set task_title = :taskTitle,task_description =:taskDesc, task_date = :taskDate, " +
-            "task_time=:taskTime, noti_time=:notiTime where noti_id=:notiId")
+    @Query("Select * from to_do_table where task_status == 1")
+    fun getCompleteTask(): LiveData<List<ToDoTaskModel>>
+
+    @Query("Update to_do_table Set task_status = 1 where noti_id=:uid")
+    fun finishTask(uid: Long)
+
+    @Query(
+        "Update to_do_table Set task_title = :taskTitle,task_description =:taskDesc, task_date = :taskDate, " +
+                "task_time=:taskTime, noti_time=:notiTime where noti_id=:notiId"
+    )
     fun updateTask(
         taskTitle: String,
         taskDesc: String,

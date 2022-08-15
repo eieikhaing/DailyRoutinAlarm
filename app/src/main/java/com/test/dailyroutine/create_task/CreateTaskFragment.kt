@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -86,6 +87,18 @@ class CreateTaskFragment : Fragment() {
             edtTime.setOnClickListener {
                 setTimeListener()
             }
+
+            edtTaskTitle.addTextChangedListener {
+                tlTaskTitle.error = null
+            }
+
+            edtTask.addTextChangedListener {
+                tlTask.error = null
+            }
+
+            edtSetDate.addTextChangedListener {
+                tlSetDate.error = null
+            }
         }
         return binding.root
     }
@@ -155,6 +168,15 @@ class CreateTaskFragment : Fragment() {
         binding.apply {
             if (TextUtils.isEmpty(edtTaskTitle.text)) {
                 tlTaskTitle.error = "Enter Task Title"
+                return false
+            }
+            if (TextUtils.isEmpty(edtTask.text)) {
+                tlTask.error = "Enter Task Detail"
+                return false
+            }
+
+            if (TextUtils.isEmpty(edtSetDate.text)) {
+                tlSetDate.error = "Enter Date"
                 return false
             }
         }

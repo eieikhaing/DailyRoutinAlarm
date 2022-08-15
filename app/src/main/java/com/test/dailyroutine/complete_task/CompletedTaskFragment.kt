@@ -1,44 +1,44 @@
-package com.test.dailyroutine.task_list
+package com.test.dailyroutine.complete_task
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.test.dailyroutine.*
 import com.test.dailyroutine.database.ToDoDao
 import com.test.dailyroutine.database.ToDoDatabase
-import com.test.dailyroutine.databinding.FragTaskListBinding
+import com.test.dailyroutine.databinding.FragCompleteTaskListBinding
+import com.test.dailyroutine.task_list.TaskListViewModel
+import com.test.dailyroutine.task_list.TaskListViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
+class CompletedTaskFragment : Fragment() {
 
-class TaskListFragment : Fragment() {
-
-    private lateinit var binding: FragTaskListBinding
+    private lateinit var binding: FragCompleteTaskListBinding
     private lateinit var taskListViewModel: TaskListViewModel
     lateinit var myCalendar: Calendar
-    lateinit var dataSource : ToDoDao
-    private lateinit var taskListAdapter: TaskListAdapter
+    lateinit var dataSource: ToDoDao
+    private lateinit var taskListAdapter: CompleteTaskListAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragTaskListBinding.inflate(layoutInflater)
+        binding = FragCompleteTaskListBinding.inflate(layoutInflater)
         val application = requireNotNull(this.activity).application
 
         dataSource = ToDoDatabase.getInstance(application).todoDao
@@ -50,38 +50,29 @@ class TaskListFragment : Fragment() {
             ).get(TaskListViewModel::class.java)
         binding.viewModel = taskListViewModel
         binding.lifecycleOwner = this
-        taskListViewModel.getAllTaskList()
-        taskListAdapter = TaskListAdapter(this)
+        taskListViewModel.getCompleteTask()
+        taskListAdapter = CompleteTaskListAdapter(this)
         binding.rvTaskList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = taskListAdapter
 
         }
-        taskListViewModel.responseTaskList?.observe(this, Observer {
-            Log.d("All Task", it.toString())
+        taskListViewModel.responseTaskList?.observe(this,{
             taskListAdapter.setData(it)
         })
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         myCalendar = Calendar.getInstance()
-        binding.btnAddTask.setOnClickListener {
-            findNavController().navigate(R.id.action_taskListFragment_to_createTaskFragment)
-        }
         initSwipe()
     }
 
     private fun initSwipe() {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
             0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ItemTouchHelper.LEFT
         ) {
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -95,16 +86,9 @@ class TaskListFragment : Fragment() {
                 if (direction == ItemTouchHelper.LEFT) {
                     GlobalScope.launch(Dispatchers.IO) {
                         val deletedId = taskListAdapter.getItemId(position)
-                       // val notiId = dataSource.getNotiId(deletedId)
-                        dataSource.deleteTask(deletedId)
-                        deleteNotification(deletedId)
-                    }
-                }else if (direction == ItemTouchHelper.RIGHT) {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        val completedId = taskListAdapter.getItemId(position)
                         // val notiId = dataSource.getNotiId(deletedId)
-                        dataSource.finishTask(completedId)
-                        deleteNotification(completedId)
+                        dataSource.deleteTask(deletedId)
+                        //deleteNotification(deletedId)
                     }
                 }
             }
@@ -126,8 +110,10 @@ class TaskListFragment : Fragment() {
 
                     if (dX > 0) {
 
-                       // icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
-                        icon =  ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_done)?.toBitmap()!!
+                        // icon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+                        icon =
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_done)
+                                ?.toBitmap()!!
                         paint.color = Color.parseColor("#388E3C")
 
                         canvas.drawRect(
@@ -147,7 +133,10 @@ class TaskListFragment : Fragment() {
                         /*icon = BitmapFactory.decodeResource(requireContext().resources,
                             R.drawable.ic_baseline_delete
                         )*/
-                        icon =  ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_delete)?.toBitmap()!!
+                        icon = ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.ic_baseline_delete
+                        )?.toBitmap()!!
 
                         paint.color = Color.parseColor("#D32F2F")
 
@@ -185,74 +174,5 @@ class TaskListFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvTaskList)
     }
-
-    private fun deleteNotification(notiId: Long) {
-        val intent = Intent(requireContext(), AlarmNotification::class.java)
-        intent.putExtra(notiIdExtra, notiId)
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireContext(),
-            notificationID,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
-
-        )
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-       // val time = getTime(notiTime)
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            myCalendar.time.time,
-            pendingIntent
-        )
-        alarmManager.cancel(pendingIntent)
-    }
-
-    private fun scheduleNotification(taskTitle: String, taskDesc: String, notiTime: String)
-    {
-        Log.d("send noti",taskTitle)
-        val intent = Intent(requireContext(), AlarmNotification::class.java)
-        val title = taskTitle
-        val message = taskDesc
-        intent.putExtra(titleExtra, title)
-        intent.putExtra(messageExtra, message)
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireContext(),
-            myCalendar.time.time.toInt(),
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val time = getTime(notiTime)
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            time,
-            pendingIntent
-        )
-
-    }
-    private fun getTime(notiTime: String): Long
-    {
-        val calendar = Calendar.getInstance()
-        calendar.set(notiTime.split(",")[0].toInt(),notiTime.split(",")[1].toInt(),notiTime.split(",")[2].toInt(), notiTime.split(",")[3].toInt(), notiTime.split(",")[4].toInt())
-        return calendar.timeInMillis
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu,menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.complete_task -> {
-                findNavController().navigate(R.id.action_taskListFragment_to_completedTaskFragment)
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
 
 }

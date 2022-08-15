@@ -23,11 +23,11 @@ data class ToDoTaskModel(
     @ColumnInfo(name = "noti_time")
     var notiTime: String,
 
-   /* @ColumnInfo(name = "task_status")
-    var isFinished: Long = 0,
-*/
     @ColumnInfo(name = "noti_id")
     var notiId: Int = 0,
+
+    @ColumnInfo(name = "task_status")
+    var taskStatus: Int = 0,
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

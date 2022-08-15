@@ -3,12 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/drawable/ic_baseline_delete.xml" value="0.20092592592592592" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/frag_add_task.xml" value="0.18" />
+        <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/frag_complete_task_list.xml" value="0.19429347826086957" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/frag_task_list.xml" value="0.25" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/frag_update_task.xml" value="0.19157608695652173" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/item_task.xml" value="0.1" />
         <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/layout/task_list.xml" value="0.25" />
+        <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/menu/main_menu.xml" value="0.20416666666666666" />
+        <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/mipmap-anydpi-v26/ic_daily_routine.xml" value="0.19814814814814816" />
+        <entry key="..\:/Flutter_Projects/DailyRoutine/app/src/main/res/mipmap-anydpi-v26/ic_daily_routine_round.xml" value="0.1398148148148148" />
       </map>
     </option>
   </component>

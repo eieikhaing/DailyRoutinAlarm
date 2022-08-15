@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -33,7 +34,7 @@ class UpdateTaskFragment : Fragment() {
 
     private lateinit var binding: FragUpdateTaskBinding
     lateinit var myCalendar: Calendar
-    lateinit var todoModel : ToDoTaskModel
+    lateinit var todoModel: ToDoTaskModel
 
     lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
@@ -99,6 +100,18 @@ class UpdateTaskFragment : Fragment() {
 
             edtTime.setOnClickListener {
                 setTimeListener()
+            }
+
+            edtTaskTitle.addTextChangedListener {
+                tlTaskTitle.error = null
+            }
+
+            edtTask.addTextChangedListener {
+                tlTask.error = null
+            }
+
+            edtSetDate.addTextChangedListener {
+                tlSetDate.error = null
             }
         }
         return binding.root
@@ -169,6 +182,15 @@ class UpdateTaskFragment : Fragment() {
         binding.apply {
             if (TextUtils.isEmpty(edtTaskTitle.text)) {
                 tlTaskTitle.error = "Enter Task Title"
+                return false
+            }
+            if (TextUtils.isEmpty(edtTask.text)) {
+                tlTask.error = "Enter Task Detail"
+                return false
+            }
+
+            if (TextUtils.isEmpty(edtSetDate.text)) {
+                tlSetDate.error = "Enter Date"
                 return false
             }
         }

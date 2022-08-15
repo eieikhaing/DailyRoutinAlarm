@@ -20,4 +20,8 @@ class TaskListViewModel (
         responseTaskList = database.getTask()
     }
 
+    fun getCompleteTask() {
+        responseTaskList = database.getCompleteTask()
+    }
+
 }
